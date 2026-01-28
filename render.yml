@@ -1,0 +1,31 @@
+services:
+  # Flask API
+  - type: web
+    name: frame-analysis-api
+    env: python
+    buildCommand: pip install -r requirements.txt && apt-get update && apt-get install -y ffmpeg
+    startCommand: gunicorn frame_analysis:app --bind 0.0.0.0:$PORT --timeout 300
+    envVars:
+      - key: REDIS_URL
+        fromService:
+          name: frame-analysis-redis
+          type: redis
+          property: connectionString
+    
+  # Redis
+  - type: redis
+    name: frame-analysis-redis
+    plan: starter
+    
+  # Celery Worker
+  - type: worker
+    name: frame-analysis-worker
+    env: python
+    buildCommand: pip install -r requirements.txt && apt-get update && apt-get install -y ffmpeg
+    startCommand: celery -A frame_analysis.celery_app worker --loglevel=info --pool=solo
+    envVars:
+      - key: REDIS_URL
+        fromService:
+          name: frame-analysis-redis
+          type: redis
+          property: connectionString
