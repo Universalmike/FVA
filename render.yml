@@ -1,31 +1,58 @@
 services:
-  # Flask API
+  # Flask API Web Service
   - type: web
     name: frame-analysis-api
     env: python
-    buildCommand: pip install -r requirements.txt && apt-get update && apt-get install -y ffmpeg
-    startCommand: gunicorn frame_analysis:app --bind 0.0.0.0:$PORT --timeout 300
+    region: oregon
+    plan: free
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      apt-get update && apt-get install -y ffmpeg
+    startCommand: gunicorn frame_analysis:app --bind 0.0.0.0:$PORT --timeout 300 --workers 2
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
       - key: REDIS_URL
         fromService:
           name: frame-analysis-redis
           type: redis
           property: connectionString
+      - key: ALLOWED_ORIGINS
+        value: "*"
+      - key: UPLOAD_FOLDER
+        value: /tmp/uploads
+      - key: OUTPUT_FOLDER
+        value: /tmp/frame_analysis
+    healthCheckPath: /api/health
     
-  # Redis
-  - type: redis
-    name: frame-analysis-redis
-    plan: starter
-    
-  # Celery Worker
+  # Celery Worker Background Worker
   - type: worker
     name: frame-analysis-worker
     env: python
-    buildCommand: pip install -r requirements.txt && apt-get update && apt-get install -y ffmpeg
-    startCommand: celery -A frame_analysis.celery_app worker --loglevel=info --pool=solo
+    region: oregon
+    plan: free
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      apt-get update && apt-get install -y ffmpeg
+    startCommand: celery -A frame_analysis.celery_app worker --loglevel=info --pool=solo --concurrency=2
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
       - key: REDIS_URL
         fromService:
           name: frame-analysis-redis
           type: redis
           property: connectionString
+      - key: UPLOAD_FOLDER
+        value: /tmp/uploads
+      - key: OUTPUT_FOLDER
+        value: /tmp/frame_analysis
+    
+  # Redis Service
+  - type: redis
+    name: frame-analysis-redis
+    region: oregon
+    plan: free
+    maxmemoryPolicy: allkeys-lru
