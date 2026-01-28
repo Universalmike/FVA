@@ -980,7 +980,14 @@ from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from flask import send_file
 
+# Environment variables for production
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', '/tmp/uploads')
+OUTPUT_FOLDER = os.getenv('OUTPUT_FOLDER', '/tmp/frame_analysis')
+PORT = int(os.getenv('PORT', 5000))
+
 app = Flask(__name__)
+ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', '*').split(',')
 CORS(app, resources={
     r"/api/*": {
         "origins": "*",  # Allow all origins
@@ -988,6 +995,14 @@ CORS(app, resources={
         "allow_headers": ["Content-Type"]
     }
 })
+
+# Celery configuration with environment variable
+celery_app = Celery(
+    'frame_analysis',
+    broker=REDIS_URL,
+    backend=REDIS_URL
+)
+
 app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB max
 
@@ -1129,4 +1144,5 @@ if __name__ == '__main__':
     print("   curl -X POST -F 'video=@test.mp4' http://localhost:5000/api/analyze/video")
     
     # Run Flask app
+
     app.run(debug=True, host='0.0.0.0', port=5000)
