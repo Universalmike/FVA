@@ -1,0 +1,12 @@
+flask
+flask-cors
+celery
+redis
+opencv-python-headless
+numpy
+scikit-image
+Pillow
+scipy
+ffmpeg-python
+gunicorn
+reportlab
