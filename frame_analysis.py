@@ -69,6 +69,8 @@ celery_app.conf.update(
     result_serializer='json',
     timezone='UTC',
     enable_utc=True,
+    task_always_eager=True,
+    task_eager_propagates=True
 )
 
 # ============================================================================
@@ -1147,6 +1149,7 @@ if __name__ == '__main__':
     # Run Flask app
 
     app.run(debug=True, host='0.0.0.0', port=5000)
+
 
 
 
