@@ -59,8 +59,8 @@ logger = logging.getLogger(__name__)
 # Celery configuration
 celery_app = Celery(
     'frame_analysis',
-    broker='redis://localhost:6379',
-    backend='redis://localhost:6379'
+    broker=REDIS_URL,
+    backend=REDIS_URL
 )
 
 celery_app.conf.update(
@@ -1147,5 +1147,6 @@ if __name__ == '__main__':
     # Run Flask app
 
     app.run(debug=True, host='0.0.0.0', port=5000)
+
 
 
