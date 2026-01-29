@@ -1009,6 +1009,7 @@ app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB max
 app.config['CELERY_BROKER_URL'] = REDIS_URL
 app.config['CELERY_RESULT_BACKEND'] = REDIS_URL
+app.config['CELERY_ALWAYS_EAGER'] = True
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 @app.route('/api/health', methods=['GET'])
@@ -1149,6 +1150,7 @@ if __name__ == '__main__':
     # Run Flask app
 
     app.run(debug=True, host='0.0.0.0', port=5000)
+
 
 
 
