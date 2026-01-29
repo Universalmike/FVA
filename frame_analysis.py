@@ -43,7 +43,7 @@ import ffmpeg
 
 # Celery for job queue
 from celery import Celery
-REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
 celery_app = Celery(
     'frame_analysis',
     broker=REDIS_URL,
@@ -59,8 +59,8 @@ logger = logging.getLogger(__name__)
 # Celery configuration
 celery_app = Celery(
     'frame_analysis',
-    broker='redis://localhost:6379/0',
-    backend='redis://localhost:6379/0'
+    broker='redis://localhost:6379',
+    backend='redis://localhost:6379'
 )
 
 celery_app.conf.update(
@@ -981,7 +981,7 @@ from flask_cors import CORS
 from flask import send_file
 
 # Environment variables for production
-REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
 UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', '/tmp/uploads')
 OUTPUT_FOLDER = os.getenv('OUTPUT_FOLDER', '/tmp/frame_analysis')
 PORT = int(os.getenv('PORT', 5000))
@@ -1005,7 +1005,8 @@ celery_app = Celery(
 
 app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB max
-
+app.config['CELERY_BROKER_URL'] = REDIS_URL
+app.config['CELERY_RESULT_BACKEND'] = REDIS_URL
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 @app.route('/api/health', methods=['GET'])
@@ -1146,4 +1147,5 @@ if __name__ == '__main__':
     # Run Flask app
 
     app.run(debug=True, host='0.0.0.0', port=5000)
+
 
