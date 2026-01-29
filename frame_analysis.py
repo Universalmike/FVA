@@ -43,11 +43,11 @@ import ffmpeg
 
 # Celery for job queue
 from celery import Celery
-
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 celery_app = Celery(
     'frame_analysis',
-    broker='redis://localhost:6379/0',
-    backend='redis://localhost:6379/0'
+    broker=REDIS_URL,
+    backend=REDIS_URL
 )
 # ============================================================================
 # CONFIGURATION
@@ -1146,3 +1146,4 @@ if __name__ == '__main__':
     # Run Flask app
 
     app.run(debug=True, host='0.0.0.0', port=5000)
+
