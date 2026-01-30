@@ -983,6 +983,7 @@ from flask_cors import CORS
 from flask import send_file
 
 # Environment variables for production
+PORT = int(os.getenv('PORT', 5000))
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
 UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', '/tmp/uploads')
 OUTPUT_FOLDER = os.getenv('OUTPUT_FOLDER', '/tmp/frame_analysis')
@@ -1150,6 +1151,7 @@ if __name__ == '__main__':
     # Run Flask app
 
     app.run(debug=True, host='0.0.0.0', port=5000)
+
 
 
 
